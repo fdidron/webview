@@ -1579,14 +1579,21 @@ release:
   WEBVIEW_API void webview_dialog(struct webview *w,
       enum webview_dialog_type dlgtype, int flags,
       const char *title, const char *arg,
-      char *result, size_t resultsz) {
+      char *result, size_t resultsz, char *filter) {
     if (dlgtype == WEBVIEW_DIALOG_TYPE_OPEN ||
         dlgtype == WEBVIEW_DIALOG_TYPE_SAVE) {
       IFileDialog *dlg = NULL;
       IShellItem *res = NULL;
       WCHAR *ws = NULL;
       char *s = NULL;
+      wchar_t *wFilter = (wchar_t *)malloc(4096);
       FILEOPENDIALOGOPTIONS opts, add_opts;
+
+      MultiByteToWideChar(CP_ACP, 0, filter, -1, wFilter, 4096);
+      COMDLG_FILTERSPEC rgSpec[] =
+      { 
+        {wFilter, wFilter},
+      };
       if (dlgtype == WEBVIEW_DIALOG_TYPE_OPEN) {
         if (CoCreateInstance(
               iid_unref(&CLSID_FileOpenDialog), NULL, CLSCTX_INPROC_SERVER,
@@ -1616,6 +1623,9 @@ release:
       }
       opts &= ~FOS_NOREADONLYRETURN;
       opts |= add_opts;
+      if (dlg->lpVtbl->SetFileTypes(dlg, 1, rgSpec) != S_OK) {
+        goto error_dlg;
+      }
       if (dlg->lpVtbl->SetOptions(dlg, opts) != S_OK) {
         goto error_dlg;
       }
