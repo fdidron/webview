@@ -164,7 +164,7 @@ WEBVIEW_API void webview_set_color(struct webview *w, uint8_t r, uint8_t g,
 WEBVIEW_API void webview_dialog(struct webview *w,
                                 enum webview_dialog_type dlgtype, int flags,
                                 const char *title, const char *arg,
-                                char *result, size_t resultsz);
+                                char *result, size_t resultsz, char *filter);
 WEBVIEW_API void webview_dispatch(struct webview *w, webview_dispatch_fn fn,
                                   void *arg);
 WEBVIEW_API void webview_terminate(struct webview *w);
@@ -374,7 +374,7 @@ WEBVIEW_API void webview_set_color(struct webview *w, uint8_t r, uint8_t g,
 WEBVIEW_API void webview_dialog(struct webview *w,
                                 enum webview_dialog_type dlgtype, int flags,
                                 const char *title, const char *arg,
-                                char *result, size_t resultsz) {
+                                char *result, size_t resultsz, char *filter) {
   GtkWidget *dlg;
   if (result != NULL) {
     result[0] = '\0';
@@ -1411,7 +1411,7 @@ WEBVIEW_API void webview_set_fullscreen(struct webview *w, int fullscreen) {
 WEBVIEW_API void webview_set_color(struct webview *w, uint8_t r, uint8_t g,
                                    uint8_t b, uint8_t a) {
   HBRUSH brush = CreateSolidBrush(RGB(r, g, b));
-  SetClassLongPtr(w->priv.hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)brush);  
+  SetClassLongPtr(w->priv.hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)brush);
 }
 
 /* These are missing parts from MinGW */
@@ -1501,7 +1501,7 @@ DEFINE_GUID(IID_IFileSaveDialog, 0x84bccd23, 0x5fde, 0x4cdb, 0xae, 0xa4, 0xaf,
 WEBVIEW_API void webview_dialog(struct webview *w,
                                 enum webview_dialog_type dlgtype, int flags,
                                 const char *title, const char *arg,
-                                char *result, size_t resultsz) {
+                                char *result, size_t resultsz, char *filter) {
   if (dlgtype == WEBVIEW_DIALOG_TYPE_OPEN ||
       dlgtype == WEBVIEW_DIALOG_TYPE_SAVE) {
     IFileDialog *dlg = NULL;
@@ -1800,7 +1800,7 @@ WEBVIEW_API void webview_set_color(struct webview *w, uint8_t r, uint8_t g,
 WEBVIEW_API void webview_dialog(struct webview *w,
                                 enum webview_dialog_type dlgtype, int flags,
                                 const char *title, const char *arg,
-                                char *result, size_t resultsz) {
+                                char *result, size_t resultsz, char *filter) {
   if (dlgtype == WEBVIEW_DIALOG_TYPE_OPEN ||
       dlgtype == WEBVIEW_DIALOG_TYPE_SAVE) {
     NSSavePanel *panel;
